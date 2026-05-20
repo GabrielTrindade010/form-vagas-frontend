@@ -25,7 +25,7 @@ const schema = z.object({
   endereco: z.string().optional(),
   numero: z.string().optional(),
   complemento: z.string().optional(),
-  phone: z.string().min(10, 'Celular inválido'),
+  phone: z.string().refine((val) => val && val.replace(/\D/g, '').length > 6, 'Celular inválido'),
   foneRes: z.string().optional(),
   foneRecado: z.string().optional(),
   falarCom: z.string().optional(),

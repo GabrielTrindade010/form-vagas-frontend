@@ -9,12 +9,18 @@ export const maskCPF = (value) => {
 };
 
 export const maskPhone = (value) => {
-  return value
-    .replace(/\D/g, '')
-    .substring(0, 11) // Limite de 11 dígitos
+  if (!value) return '';
+  const v = value.replace(/\D/g, '');
+  
+  if (v.length <= 10) {
+    return v
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+  }
+  
+  return v
     .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d)/, '$1-$2')
-    .replace(/(-\d{4})\d+?$/, '$1');
+    .replace(/(\d{5})(\d)/, '$1-$2');
 };
 
 export const maskCEP = (value) => {
