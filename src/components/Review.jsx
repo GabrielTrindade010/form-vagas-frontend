@@ -33,6 +33,7 @@ function Review() {
       <p className="text-muted mb-8">Por favor, revise suas informações antes de enviar a candidatura.</p>
 
       <SummarySection title="Dados Pessoais">
+        <DataItem label="Entrevistador" value={values.entrevistador} />
         <DataItem label="Nome Completo" value={values.fullName} />
         <DataItem label="Vaga" value={values.nomeVaga} />
         <DataItem label="Celular" value={values.phone} />

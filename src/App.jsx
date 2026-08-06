@@ -8,6 +8,7 @@ import { apiUrl } from './config/api';
 
 // Components
 import Landing from './components/Landing';
+import InterviewerSelection from './components/InterviewerSelection';
 import PersonalInfo from './components/PersonalInfo';
 import ProfessionalInfo from './components/ProfessionalInfo';
 import ExperienceList from './components/ExperienceList';
@@ -20,6 +21,7 @@ import logoWhiteTransp from './assets/logo-white-transp.png';
 import { validateCPF } from './utils/validators';
 
 const schema = z.object({
+  entrevistador: z.string().min(1, 'Selecione um entrevistador'),
   fullName: z.string().min(3, 'Nome completo é obrigatório'),
   nomeVaga: z.string().min(2, 'Nome da vaga é obrigatório'),
   endereco: z.string().optional(),
@@ -68,6 +70,7 @@ const schema = z.object({
 });
 
 const steps = [
+  { id: 'step0', title: 'Entrevistador' },
   { id: 'step1', title: 'Identificação' },
   { id: 'step2', title: 'Documentos' },
   { id: 'step3', title: 'Perfil' },
@@ -90,7 +93,7 @@ function App() {
   const methods = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      fullName: '', nomeVaga: '', endereco: '', numero: '', complemento: '',
+      entrevistador: '', fullName: '', nomeVaga: '', endereco: '', numero: '', complemento: '',
       phone: '', foneRes: '', foneRecado: '', falarCom: '', dataNascimento: '',
       estadoNasceu: '', cidadeNasceu: '', trabalhouNaEmpresa: false,
       parentesNaEmpresa: false, portadorDeficiencia: false, nomePai: '',
@@ -119,9 +122,10 @@ function App() {
 
   const getFieldsForStep = (step) => {
     switch (step) {
-      case 0: return ['fullName', 'nomeVaga', 'phone'];
-      case 1: return [];
-      case 2: return [];
+      case 0: return ['entrevistador'];
+      case 1: return ['fullName', 'nomeVaga', 'phone', 'email'];
+      case 2: return ['cpf'];
+      case 3: return [];
       default: return [];
     }
   };
@@ -216,7 +220,15 @@ function App() {
           </div>
 
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <form onSubmit={methods.handleSubmit(onSubmit, (errors) => {
+              console.log('Validation errors:', errors);
+              const errorMessages = Object.values(errors).map(e => e.message).filter(Boolean);
+              if (errorMessages.length > 0) {
+                alert('Há campos inválidos ou obrigatórios não preenchidos:\n' + errorMessages.join('\n'));
+              } else {
+                alert('Há campos com formato inválido, por favor revise seus dados.');
+              }
+            })}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep}
@@ -225,10 +237,11 @@ function App() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {currentStep === 0 && <PersonalInfo />}
-                  {currentStep === 1 && <ProfessionalInfo />}
-                  {currentStep === 2 && <ExperienceList />}
-                  {currentStep === 3 && <Review />}
+                  {currentStep === 0 && <InterviewerSelection />}
+                  {currentStep === 1 && <PersonalInfo />}
+                  {currentStep === 2 && <ProfessionalInfo />}
+                  {currentStep === 3 && <ExperienceList />}
+                  {currentStep === 4 && <Review />}
                 </motion.div>
               </AnimatePresence>
 
@@ -244,7 +257,8 @@ function App() {
                 </button>
                 
                 <button 
-                  type="submit" 
+                  type={currentStep === steps.length - 1 ? 'submit' : 'button'} 
+                  onClick={currentStep === steps.length - 1 ? undefined : nextStep}
                   className="btn btn-primary"
                   disabled={isLoading}
                 >
