@@ -8,7 +8,8 @@ const interviewers = [
   'Marcelo Capecci',
   'Marcos Mondim',
   'Rafael Alves',
-  'Sidnei Trindade'
+  'Sidnei Trindade',
+  'Flávio Silva'
 ].sort((a, b) => a.localeCompare(b));
 
 function InterviewerSelection() {
