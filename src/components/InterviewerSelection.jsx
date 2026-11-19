@@ -9,7 +9,10 @@ const interviewers = [
   'Marcos Mondim',
   'Rafael Alves',
   'Sidnei Trindade',
-  'Flávio Silva'
+  'Flávio Silva',
+  'Daniel Nascimento',
+  'Matheus Lamb',
+  'Josenilda Dias'
 ].sort((a, b) => a.localeCompare(b));
 
 function InterviewerSelection() {
