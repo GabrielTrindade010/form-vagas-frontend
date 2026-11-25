@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +7,7 @@ import * as z from 'zod';
 import axios from 'axios';
 import { apiUrl } from './config/api';
 
-// Components
+// Candidate Components
 import Landing from './components/Landing';
 import InterviewerSelection from './components/InterviewerSelection';
 import PersonalInfo from './components/PersonalInfo';
@@ -17,10 +18,19 @@ import Success from './components/Success';
 import logo from './assets/logo.png';
 import logoWhite from './assets/logo-white.png';
 import logoWhiteTransp from './assets/logo-white-transp.png';
-
 import { validateCPF } from './utils/validators';
 
-const schema = z.object({
+// Admin Components
+import { AdminAuthProvider } from './admin/context/AdminAuthContext';
+import AdminLayout from './admin/layouts/AdminLayout';
+import AdminLogin from './admin/pages/AdminLogin';
+import Dashboard from './admin/pages/Dashboard';
+import ApplicationsList from './admin/pages/ApplicationsList';
+import ApplicationDetail from './admin/pages/ApplicationDetail';
+import UsersManagement from './admin/pages/UsersManagement';
+import AuditLogs from './admin/pages/AuditLogs';
+
+const candidateSchema = z.object({
   entrevistador: z.string().min(1, 'Selecione um entrevistador'),
   fullName: z.string().min(3, 'Nome completo é obrigatório'),
   nomeVaga: z.string().min(2, 'Nome da vaga é obrigatório'),
@@ -77,7 +87,7 @@ const steps = [
   { id: 'review', title: 'Revisão' },
 ];
 
-function App() {
+function CandidateForm() {
   const [showForm, setShowForm] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -91,7 +101,7 @@ function App() {
   }, [theme]);
 
   const methods = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(candidateSchema),
     defaultValues: {
       entrevistador: '', fullName: '', nomeVaga: '', endereco: '', numero: '', complemento: '',
       phone: '', foneRes: '', foneRecado: '', falarCom: '', dataNascimento: '',
@@ -276,4 +286,30 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AdminAuthProvider>
+        <Routes>
+          {/* Rota do Candidato */}
+          <Route path="/" element={<CandidateForm />} />
+
+          {/* Rota de Login do Admin */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* Rotas Protegidas do Admin */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="candidaturas" element={<ApplicationsList />} />
+            <Route path="candidaturas/:id" element={<ApplicationDetail />} />
+            <Route path="usuarios" element={<UsersManagement />} />
+            <Route path="auditoria" element={<AuditLogs />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AdminAuthProvider>
+    </BrowserRouter>
+  );
+}
